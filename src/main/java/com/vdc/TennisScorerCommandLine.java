@@ -16,8 +16,8 @@ public class TennisScorerCommandLine {
             System.exit(1);
         }
 
-        String player1 = c.readLine("Player 1: ");
-        String player2 = c.readLine("Player 2: ");
+        Player player1 = new Player(c.readLine("Player 1: "));
+        Player player2 = new Player(c.readLine("Player 2: "));
 
         TennisScore tennisScore = new TennisScore(player1, player2);
 
@@ -28,9 +28,9 @@ public class TennisScorerCommandLine {
                 pointWinner = c.readLine("Point for player: ");
             } while (!isValidPlayer(pointWinner));
             if (pointWinner.equals("1")) {
-                someoneWonTheSet= tennisScore.addOnePointForPlayer1();
+                someoneWonTheSet= tennisScore.addOnePointForPlayer(player1);
             } else {
-                someoneWonTheSet = tennisScore.addOnePointForPlayer2();
+                someoneWonTheSet = tennisScore.addOnePointForPlayer(player2);
             }
 
             c.format("Score: " + tennisScore.getPrettyPrintScore() + "%n");

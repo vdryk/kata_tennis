@@ -1,42 +1,50 @@
 package com.vdc;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * Created by Vincent on 09/01/2018.
  */
 public class SetScore {
 
-    private int gameCount1;
-    private int gameCount2;
+    private Map<Player, Integer> gameCountByPlayer;
 
-    public boolean player1WonAGame() {
-        gameCount1++;
-        if (gameCount1 == 6 && gameCount2 <= 4 || gameCount1 == 7) {
+    public SetScore(Player player1, Player player2) {
+        gameCountByPlayer = new HashMap<>();
+        gameCountByPlayer.put(player1, 0);
+        gameCountByPlayer.put(player2, 0);
+    }
+
+    public boolean addOneGameToPlayer(Player winner) {
+        Integer winnerGameCount = gameCountByPlayer.get(winner);
+        winnerGameCount++;
+        gameCountByPlayer.put(winner, winnerGameCount);
+
+        Player looser = getLooser(winner);
+        Integer looserGameCount = gameCountByPlayer.get(looser);
+
+        if (winnerGameCount == 6 && looserGameCount <= 4 || winnerGameCount == 7) {
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean player2WonAGame() {
-        gameCount2++;
-        if (gameCount2 == 6 && gameCount1 <= 4 || gameCount2 == 7) {
-            return true;
-        } else {
-            return false;
-        }
+    private Player getLooser(Player winner) {
+        return gameCountByPlayer.keySet().stream()
+                .filter(player -> !player.equals(winner))
+                .findFirst().get();
     }
 
-    public String getPrettyPrintScore() {
-        return gameCount1 + "-" + gameCount2;
+    public Map<Player, Integer> getGameCountByPlayer() {
+        return gameCountByPlayer;
     }
 
     // only useful for testing
 
-    void setGameCount1(int gameCount1) {
-        this.gameCount1 = gameCount1;
-    }
-
-    void setGameCount2(int gameCount2) {
-        this.gameCount2 = gameCount2;
+    void setGameCount(Player player, int gameCount) {
+        gameCountByPlayer.put(player, gameCount);
     }
 }

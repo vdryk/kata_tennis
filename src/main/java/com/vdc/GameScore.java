@@ -1,5 +1,11 @@
 package com.vdc;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
 /**
  * Created by Vincent on 09/01/2018.
  */
@@ -7,44 +13,32 @@ public class GameScore {
 
     public static final String DEUCE = "DEUCE";
 
-    private Player player1;
-    private Player player2;
-    private GamePoints gamePoints1;
-    private GamePoints gamePoints2;
+    private Map<Player, GamePoints> pointsByPlayer;
 
     public GameScore(Player player1, Player player2) {
-        this.player1 = player1;
-        this.player2 = player2;
-        this.gamePoints1 = GamePoints.ZERO;
-        this.gamePoints2 = GamePoints.ZERO;
+        this.pointsByPlayer = new HashMap<Player, GamePoints>();
+        this.pointsByPlayer.put(player1, GamePoints.ZERO);
+        this.pointsByPlayer.put(player2, GamePoints.ZERO);
     }
 
-    public Player getPlayer1() {
-        return player1;
-    }
+    public boolean addOnePointToPlayer(Player winner) {
+        GamePoints winnerPoints = pointsByPlayer.get(winner);
+        Player looser = getLooser(winner);
+        GamePoints looserPoints = pointsByPlayer.get(looser);
 
-    public Player getPlayer2() {
-        return player2;
-    }
+        winnerPoints = nextWinnerPoints(winnerPoints, looserPoints);
+        looserPoints = nextLooserPoints(looserPoints);
 
-    public GamePoints getGamePoints1() {
-        return gamePoints1;
-    }
+        pointsByPlayer.put(winner, winnerPoints);
+        pointsByPlayer.put(looser, looserPoints);
 
-    public GamePoints getGamePoints2() {
-        return gamePoints2;
-    }
-
-    public boolean player1WonAPoint() {
-        gamePoints1 = nextWinnerPoints(gamePoints1, gamePoints2);
-        gamePoints2 = nextLooserPoints(gamePoints2);
         return hasSomeoneWonTheGame();
     }
 
-    public boolean player2WonAPoint() {
-        gamePoints2 = nextWinnerPoints(gamePoints2, gamePoints1);
-        gamePoints1 = nextLooserPoints(gamePoints1);
-        return hasSomeoneWonTheGame();
+    private Player getLooser(Player winner) {
+        return pointsByPlayer.keySet().stream()
+                .filter(player -> !player.equals(winner))
+                .findFirst().get();
     }
 
     /**
@@ -84,37 +78,22 @@ public class GameScore {
         return looserGamePoints == GamePoints.ADVANTAGE ? GamePoints.FOURTEEN : looserGamePoints;
     }
 
-    public String getPrettyPrintScore() {
-        String score = player1.getName() + "-" + player2.getName() + " : ";
-        if (gamePoints1 == GamePoints.FOURTEEN && gamePoints2 == GamePoints.FOURTEEN) {
-            score += DEUCE;
-        } else {
-            score += gamePoints1.getText() + "-" + gamePoints2.getText();
-        }
-        return score;
+    public Map<Player, GamePoints> getPointsByPlayer() {
+        return pointsByPlayer;
+    }
+
+    private boolean isDeuce() {
+        return pointsByPlayer.values().stream()
+                .allMatch(gamePoints -> gamePoints == GamePoints.FOURTEEN);
     }
 
     public boolean hasSomeoneWonTheGame() {
-        return andTheGameWinnerIs() != null;
-    }
-
-    public Player andTheGameWinnerIs() {
-        if (gamePoints1 == GamePoints.GAME) {
-            return player1;
-        } else if (gamePoints2 == GamePoints.GAME) {
-            return player2;
-        } else {
-            return null;
-        }
+        return pointsByPlayer.values().contains(GamePoints.GAME);
     }
 
     // only useful for test
-    void setGamePoints1(GamePoints gamePoints) {
-        gamePoints1 = gamePoints;
-    }
-
-    void setGamePoints2(GamePoints gamePoints) {
-        gamePoints2 = gamePoints;
+    void setGamePoints(Player player, GamePoints gamePoints) {
+        pointsByPlayer.put(player, gamePoints);
     }
 
 }

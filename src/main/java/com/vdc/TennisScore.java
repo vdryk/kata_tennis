@@ -11,34 +11,20 @@ public class TennisScore {
     private SetScore currentSetScore;
     private GameScore currentGameScore;
 
-    public TennisScore(String player1, String player2) {
-        this.player1 = new Player(player1);
-        this.player2 = new Player(player2);
-        this.currentGameScore = new GameScore(this.player1, this.player2);
-        this.currentSetScore = new SetScore();
+    public TennisScore(Player player1, Player player2) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.currentGameScore = new GameScore(player1, player2);
+        this.currentSetScore = new SetScore(player1, player2);
     }
 
-    public boolean addOnePointForPlayer1() {
-        boolean someoneWonTheGame = this.currentGameScore.player1WonAPoint();
+    public boolean addOnePointForPlayer(Player player) {
+        boolean someoneWonTheGame = this.currentGameScore.addOnePointToPlayer(player);
 
         boolean someoneWonTheSet = false;
         if (someoneWonTheGame) {
             currentGameScore = new GameScore(this.player1, this.player2);
-            someoneWonTheSet = this.currentSetScore.player1WonAGame();
-        } else {
-            someoneWonTheSet = false;
-        }
-
-        return someoneWonTheSet;
-    }
-
-    public boolean addOnePointForPlayer2() {
-        boolean someoneWonTheGame = this.currentGameScore.player2WonAPoint();
-
-        boolean someoneWonTheSet = false;
-        if (someoneWonTheGame) {
-            currentGameScore = new GameScore(this.player1, this.player2);
-            someoneWonTheSet = this.currentSetScore.player2WonAGame();
+            someoneWonTheSet = this.currentSetScore.addOneGameToPlayer(player);
         } else {
             someoneWonTheSet = false;
         }
@@ -47,8 +33,11 @@ public class TennisScore {
     }
 
     public String getPrettyPrintScore() {
-        String gameScore = this.currentGameScore.getPrettyPrintScore();
-        String setScore = this.currentSetScore.getPrettyPrintScore();
-        return gameScore + "\n" + setScore;
+        String score = player1.getName() + "-" + player2.getName() + " : \n";
+        score += "Current game: " + this.currentGameScore.getPointsByPlayer().get(player1).getText() + "-" +
+                this.currentGameScore.getPointsByPlayer().get(player2).getText() + "\n";
+        score += this.currentSetScore.getGameCountByPlayer().get(player1) + "-" +
+                this.currentSetScore.getGameCountByPlayer().get(player2) + "\n";
+        return score;
     }
 }

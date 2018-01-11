@@ -18,8 +18,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TennisScoreTest {
 
+    public static final Player BOB = new Player("Bob l'eponge");
+    public static final Player PETE = new Player("Pete Sampras");
+
     @InjectMocks
-    private TennisScore tennisScore = new TennisScore("Bob l'eponge", "Pete Sampras");
+    private TennisScore tennisScore = new TennisScore(BOB, PETE);
 
     @Mock
     private SetScore setScore;
@@ -28,37 +31,37 @@ public class TennisScoreTest {
 
     @Test
     public void assuming_player_1_cannot_win_the_game_yet_when_player_1_scores_then_should_increment_game_score() {
-        when(gameScore.player1WonAPoint()).thenReturn(false);
-        when(setScore.player1WonAGame()).thenReturn(false);
+        when(gameScore.addOnePointToPlayer(BOB)).thenReturn(false);
+        when(setScore.addOneGameToPlayer(BOB)).thenReturn(false);
 
-        boolean player1WinTheSet = tennisScore.addOnePointForPlayer1();
+        boolean player1WinTheSet = tennisScore.addOnePointForPlayer(BOB);
 
-        verify(gameScore).player1WonAPoint();
-        verify(setScore, never()).player1WonAGame();
+        verify(gameScore).addOnePointToPlayer(BOB);
+        verify(setScore, never()).addOneGameToPlayer(BOB);
         assertFalse(player1WinTheSet);
     }
 
     @Test
      public void assuming_player_1_needs_one_point_to_win_the_game_when_player_1_scores_then_should_increment_set_score() {
-        when(gameScore.player1WonAPoint()).thenReturn(true);
-        when(setScore.player1WonAGame()).thenReturn(false);
+        when(gameScore.addOnePointToPlayer(BOB)).thenReturn(true);
+        when(setScore.addOneGameToPlayer(BOB)).thenReturn(false);
 
-        boolean player1WinTheSet = tennisScore.addOnePointForPlayer1();
+        boolean player1WinTheSet = tennisScore.addOnePointForPlayer(BOB);
 
-        verify(gameScore).player1WonAPoint();
-        verify(setScore).player1WonAGame();
+        verify(gameScore).addOnePointToPlayer(BOB);
+        verify(setScore).addOneGameToPlayer(BOB);
         assertFalse(player1WinTheSet);
     }
 
     @Test
     public void assuming_player_1_needs_one_point_to_win_the_set_when_player_1_scores_then_should_win() {
-        when(gameScore.player1WonAPoint()).thenReturn(true);
-        when(setScore.player1WonAGame()).thenReturn(true);
+        when(gameScore.addOnePointToPlayer(BOB)).thenReturn(true);
+        when(setScore.addOneGameToPlayer(BOB)).thenReturn(true);
 
-        boolean player1WinTheSet = tennisScore.addOnePointForPlayer1();
+        boolean player1WinTheSet = tennisScore.addOnePointForPlayer(BOB);
 
-        verify(gameScore).player1WonAPoint();
-        verify(setScore).player1WonAGame();
+        verify(gameScore).addOnePointToPlayer(BOB);
+        verify(setScore).addOneGameToPlayer(BOB);
         assertTrue(player1WinTheSet);
     }
 
