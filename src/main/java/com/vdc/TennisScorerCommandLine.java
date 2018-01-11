@@ -16,23 +16,24 @@ public class TennisScorerCommandLine {
             System.exit(1);
         }
 
-        Player player1 = new Player(c.readLine("Player 1: "));
-        Player player2 = new Player(c.readLine("Player 2: "));
+        String player1 = c.readLine("Player 1: ");
+        String player2 = c.readLine("Player 2: ");
 
-        Game game = new Game(player1, player2);
+        TennisScore tennisScore = new TennisScore(player1, player2);
 
-        while (!game.isFinished()) {
+        boolean someoneWonTheSet = false;
+        while (!someoneWonTheSet) {
             String pointWinner = "";
             do {
                 pointWinner = c.readLine("Point for player: ");
             } while (!isValidPlayer(pointWinner));
             if (pointWinner.equals("1")) {
-                game.player1WonAPoint();
+                someoneWonTheSet= tennisScore.addOnePointForPlayer1();
             } else {
-                game.player2WonAPoint();
+                someoneWonTheSet = tennisScore.addOnePointForPlayer2();
             }
 
-            c.format("Score: " + game.getHumanReadableScore() + "%n");
+            c.format("Score: " + tennisScore.getPrettyPrintScore() + "%n");
         }
 
     }
